@@ -11,6 +11,7 @@ void setup() {
 
 unsigned short address = 0x0000;
 boolean initDone = false;
+unsigned int count = 0;
 
 void loop() {
   if (!initDone) {
@@ -18,13 +19,17 @@ void loop() {
     writeLong(address, millis());
   }
   
-  digitalWrite(LED_PIN, HIGH);
-  delay(200);
-  digitalWrite(LED_PIN, LOW);
-  delay(200);
-
-  address += 8;
-  writeLong(address, millis());
+  if (count < 10) {
+    digitalWrite(LED_PIN, HIGH);
+    delay(200);
+    digitalWrite(LED_PIN, LOW);
+    delay(200);
+  
+    address += sizeof(long);
+    writeLong(address, millis());
+    
+    count++;
+  }
 }
 
 void writeLong(unsigned short address, unsigned long data) {
@@ -55,9 +60,7 @@ void writeLong(unsigned short address, unsigned long data) {
   Wire.beginTransmission(AT24C256_ADDR);
   Wire.write(msb);
   Wire.write(lsb);
-  Wire.endTransmission();
-  
-  Wire.beginTransmission(AT24C256_ADDR);
+
   Wire.write(b1);
   Wire.write(b2);
   Wire.write(b3);
