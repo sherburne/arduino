@@ -36,9 +36,9 @@ int pause = 3000;
 
 void loop() {
   digitalWrite(LED_PIN, HIGH);   // turn the LED on (HIGH is the voltage level)
-  delay(100);               // wait for a second
+  delay(200);               // wait for a second
   digitalWrite(LED_PIN, LOW);    // turn the LED off by making the voltage LOW
-  delay(100);               // wait for a second
+  delay(200);               // wait for a second
   
   if (done == false) {
     readCalibrationData();
@@ -51,13 +51,13 @@ void loop() {
   if (p > lastP * 1.0001 || p < lastP * .9999) {
     lastP = p;
     
-//    Serial.print("temp = ");
-//    Serial.print(t * 9.0 / 50.0 + 32.0, DEC);
-//    Serial.println(" degF");
-//      
-//    Serial.print("pressure = ");
-//    Serial.print(p * 0.01, DEC);
-//    Serial.println(" mb");
+    Serial.print("temp = ");
+    Serial.print(t * 9.0 / 50.0 + 32.0, DEC);
+    Serial.println(" degF");
+      
+    Serial.print("pressure = ");
+    Serial.print(p * 0.01, DEC);
+    Serial.println(" mb");
     
     long a = calculateAbsoluteAltitude(p);
     Serial.print("altitude = ");
