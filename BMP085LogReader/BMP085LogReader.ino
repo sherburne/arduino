@@ -1,8 +1,8 @@
 #include <Wire.h>
 
-#define AT24C256_ADDR 0x50
+#define AT24C256_ADDR   0x50
 #define EEPROM_KBITS    256
-#define PAGE_BYTES      64
+#define PAGE_BYTES      16
 
 void setup() {
   Serial.begin(9600);
@@ -22,7 +22,7 @@ void readAll() {
   Wire.write(0x00);
   Wire.endTransmission();
   
-  unsigned short pages = 512;//(EEPROM_KBITS / 8 * 1024) / PAGE_BYTES;
+  unsigned long pages = 2048; // (EEPROM_KBITS / 8 * 1024) / PAGE_BYTES;
 
   Serial.print("Reading ");
   Serial.print(pages, DEC);
@@ -43,18 +43,23 @@ void readAll() {
       time = (time + buffer[index++]) << 8;
       time = (time + buffer[index++]);
       
-      unsigned long altitude = 0;
-      altitude = (altitude + buffer[index++]) << 8;
-      altitude = (altitude + buffer[index++]) << 8;
+      unsigned short temperature = 0;
+      temperature = (temperature + buffer[index++]) << 8;
+      temperature = (temperature + buffer[index++]);
+      
+      unsigned short altitude = 0;
       altitude = (altitude + buffer[index++]) << 8;
       altitude = (altitude + buffer[index++]);
       
       Serial.print("time: ");
       Serial.print(time, DEC);
-      Serial.print(" ms, altitude: ");
+      Serial.print(" ms, temperature: ");
+      Serial.print(temperature, DEC);
+      Serial.print(" F, altitude: ");
       Serial.print(altitude, DEC);
       Serial.println(" ft");
     }
+    delay(5);
   }
 }
 

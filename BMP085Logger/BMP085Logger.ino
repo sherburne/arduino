@@ -6,7 +6,7 @@
 
 #define EEPROM_KBITS    256
 
-#define DELTA .0001
+#define DELTA .03
 
 #define LED_PIN 13    // LED pin for Pro Mini
 
@@ -24,7 +24,7 @@ short mc = 0;
 short md = 0;
 short oss = 0;
 
-long lastP = 0;
+long lastAltitude = 0;
 
 unsigned short memoryOffset = 0x0000;
 int count = 0;
@@ -40,56 +40,58 @@ void setup() {
 
 void loop() {
   blink();
-  unsigned short altitude = readAltitude();
-  if (altitude > 0) {
-    log(millis(), altitude);
-  }
+  readAltitude();
 }
 
-unsigned short readAltitude() {
+void readAltitude() {
   unsigned short altitude = 0;
 
   long t = calculateTemperature();
   long p = calculatePressure();
   
-  if (p > lastP * (1 + DELTA) || p < lastP * (1 - DELTA)) {
-    lastP = p;
+  // Convert
+  t = t * 9.0 / 50.0 + 32.0;
+  
+  Serial.print("temp = ");
+  Serial.print(t, DEC);
+  Serial.println(" degF");
     
-    Serial.print("temp = ");
-    Serial.print(t * 9.0 / 50.0 + 32.0, DEC);
-    Serial.println(" degF");
-      
-    Serial.print("pressure = ");
-    Serial.print(p * 0.01, DEC);
-    Serial.println(" mb");
-    
-    altitude = calculateAbsoluteAltitude(p);
-    Serial.print("altitude = ");
-    Serial.print(altitude, DEC);
-    Serial.println(" m");
-    
-    altitude *= 3.2808; // Convert to feet
-    
-    Serial.print("altitude = ");
-    Serial.print(altitude, DEC);
-    Serial.println(" ft");
-  }
+  Serial.print("pressure = ");
+  Serial.print(p * 0.01, DEC);
+  Serial.println(" mb");
+  
+  altitude = calculateAbsoluteAltitude(p);
+  Serial.print("altitude = ");
+  Serial.print(altitude, DEC);
+  Serial.println(" m");
+  
+  altitude *= 3.2808; // Convert to feet
+  
+  Serial.print("altitude = ");
+  Serial.print(altitude, DEC);
+  Serial.println(" ft");
 
-  return altitude;
+  if (altitude > lastAltitude * (1 + DELTA) || altitude < lastAltitude * (1 - DELTA)) {
+    lastAltitude = altitude;
+    log(millis(), t, altitude);
+  }
+  
 }
 
 void blink() {
   digitalWrite(LED_PIN, HIGH);
-  delay(200);
+  delay(250);
   digitalWrite(LED_PIN, LOW);
-  delay(200);
+  delay(250);
 }
 
-void log(unsigned long time, unsigned long altitude) {
+void log(unsigned long time, unsigned short temp, unsigned short altitude) {
   writeLong(memoryOffset, time);
   memoryOffset += sizeof(long);
-  writeLong(memoryOffset, altitude);
-  memoryOffset += sizeof(long);
+  writeShort(memoryOffset, temp);
+  memoryOffset += sizeof(short);
+  writeShort(memoryOffset, altitude);
+  memoryOffset += sizeof(short);
   
   if (memoryOffset > (EEPROM_KBITS / 8 * 1024)) {
     memoryOffset = 0;
@@ -108,6 +110,21 @@ void writeLong(unsigned short address, unsigned long data) {
   
   Wire.write(data >> 24 & 0xFF);
   Wire.write(data >> 16 & 0xFF);
+  Wire.write(data >> 8 & 0xFF);
+  Wire.write(data & 0xFF);
+  Wire.endTransmission();
+}
+
+void writeShort(unsigned short address, unsigned short data) {
+  Serial.print("address = 0x");
+  Serial.println(address, HEX);
+  Serial.print("data = ");
+  Serial.println(data, HEX);
+  
+  Wire.beginTransmission(AT24C256_ADDR);
+  Wire.write((address & 0xFF00) >> 8);
+  Wire.write(address & 0xFF);
+  
   Wire.write(data >> 8 & 0xFF);
   Wire.write(data & 0xFF);
   Wire.endTransmission();

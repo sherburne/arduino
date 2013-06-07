@@ -92,32 +92,35 @@ void readPage(unsigned short page) {
   Serial.print(page, HEX);
   Serial.print(" to ");
   Serial.println(page + PAGE_BYTES - 1, HEX);
-  
+
   Wire.beginTransmission(AT24C256_ADDR);
   Wire.write(page >> 8);
   Wire.write(page & 0x00FF);
   Wire.endTransmission();
-
+    
   long result = 0;
-  Wire.beginTransmission(AT24C256_ADDR);
-  Wire.requestFrom(AT24C256_ADDR, 64);
-  for (int i = 0; i < 64; i++) {
-    if (i % 8 == 0) {
-      Serial.println();
-      Serial.print((i + page), HEX);
-      Serial.print(": ");
+  for (int j = 0; j < 4; j++){
+    Wire.beginTransmission(AT24C256_ADDR);
+    Wire.requestFrom(AT24C256_ADDR, 16);
+    for (int i = 0; i < 16; i++) {
+      if (i % 8 == 0) {
+        Serial.println();
+        Serial.print((i + page + (j * 16)), HEX);
+        Serial.print(": ");
+      }
+      byte b = Wire.read();
+      if (b >> 4 == 0) {Serial.print(0);}
+      Serial.print(b, HEX);
+      Serial.print(" ");
     }
-    byte b = Wire.read();
-    Serial.print(b, HEX);
-    Serial.print(" ");
+    Wire.endTransmission();
+    delay(5);
   }
-  Wire.endTransmission();
-  
   Serial.println();
 }
 
 void readAll() {
-  unsigned short pages = EEPROM_KBITS / 8 * 1024 / PAGE_BYTES;
+  unsigned short pages = 512;
   for(unsigned short page = 0; page < pages; page++) {
      readPage(page);
   } 
