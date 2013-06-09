@@ -39,8 +39,7 @@ void loop() {
   
   lcd.print("temp=");
   lcd.print(tT, DEC);
-  lcd.print(" ");
-  lcd.print((char) B11100100);
+  lcd.print((char) 0xDF);
   lcd.print("F");
     
   lcd.setCursor(0, 2);
