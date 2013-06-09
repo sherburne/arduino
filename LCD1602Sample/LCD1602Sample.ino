@@ -9,6 +9,7 @@
 //
 // Data sheet for the red LCD:
 // http://www.geeetech.com/wiki/index.php/1602_LCD
+// http://www.geeetech.com/Documents/LCD1602%20Green%20JH162A%5b1%5d.pdf
 //
 // Library for the LCD
 // https://bitbucket.org/fmalpartida/new-liquidcrystal/overview
