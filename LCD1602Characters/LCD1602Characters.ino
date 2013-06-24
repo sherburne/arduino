@@ -2,6 +2,8 @@
 #include<Serial.h>
 #include"LiquidCrystal_I2C.h"
 
+// This program works with the mjkdz LCD backpack (version b)
+
 #define LCD_TWI_ADDR 0x20
 
 // If you're not sure how to get your LCD and backpack to work, check out these threads:
