@@ -18,10 +18,15 @@ short mc = 0;
 short md = 0;
 short oss = 0;
 
-LiquidCrystal_I2C lcd(LCD_TWI_ADDR, 4, 5, 6, 0, 1, 2, 3, 7, NEGATIVE);
+// Configuration for the mjkdz board
+//LiquidCrystal_I2C lcd(LCD_TWI_ADDR, 4, 5, 6, 0, 1, 2, 3, 7, NEGATIVE);
+
+// Configuration for the LCM1602 board
+LiquidCrystal_I2C lcd(LCD_TWI_ADDR, 2, 1, 0, 4, 5, 6, 7, 3, POSITIVE);
 
 void setup() {
-  lcd.begin(16, 2, LCD_5x8DOTS);
+//  lcd.begin(16, 2, LCD_5x8DOTS);
+  lcd.begin(20, 4, LCD_5x8DOTS);
   lcd.backlight();
   
   readCalibrationData();
@@ -42,23 +47,23 @@ void loop() {
   lcd.print((char) 0xDF);
   lcd.print("F");
     
-  lcd.setCursor(0, 2);
+  lcd.setCursor(0, 1);
   
   lcd.print("pres=");
   lcd.print(pP, DEC);
   lcd.print(" mb");
   
-  delay(2000);
-  
-  lcd.clear();
-  lcd.home();
+//  delay(2000);
+//  lcd.clear();
+//  lcd.home();
+  lcd.setCursor(0, 2);
   
   long a = calculateAbsoluteAltitude(p);
   lcd.print("altitude=");
   lcd.print(a, DEC);
   lcd.print(" m");
   
-  lcd.setCursor(0, 2);
+  lcd.setCursor(0, 3);
   
   int aA = a * 3.2808;
   
